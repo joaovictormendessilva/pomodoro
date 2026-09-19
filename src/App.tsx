@@ -1,7 +1,8 @@
 import { Inter_400Regular, Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { Text, View } from "react-native";
+import { AppRoutes } from "./app-routes/AppRoutes";
+import { NavigationContainer } from "@react-navigation/native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,8 +23,8 @@ export function App() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "red" }}>
-      <Text>Hello World</Text>
-    </View>
+    <NavigationContainer>
+      <AppRoutes />
+    </NavigationContainer>
   );
 }
