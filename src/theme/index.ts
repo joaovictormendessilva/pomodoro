@@ -1,4 +1,4 @@
-export const THEME = {
+export const theme = {
   colors: {
     primary: "#137844",
     background: "#062013",
@@ -15,4 +15,4 @@ export const THEME = {
     body: 16,
     label: 12,
   },
-};
+} as const;

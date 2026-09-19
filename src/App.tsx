@@ -1,9 +1,10 @@
 import { Inter_400Regular, Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+
 import { AppRoutes } from "./app-routes/AppRoutes";
-import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
-import { THEME } from "./themes/theme";
+import { theme } from "@/theme";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,21 +30,15 @@ export function App() {
         ...DefaultTheme,
         fonts: {
           ...DefaultTheme.fonts,
-          bold: {
-            fontWeight: "700",
-            fontFamily: THEME.fonts.interBold,
-          },
-          regular: {
-            fontWeight: "500",
-            fontFamily: THEME.fonts.interRegular,
-          },
+          bold: { fontWeight: "700", fontFamily: theme.fonts.interBold },
+          regular: { fontWeight: "500", fontFamily: theme.fonts.interRegular },
         },
         colors: {
           ...DefaultTheme.colors,
-          background: THEME.colors.background,
-          primary: THEME.colors.primary,
-          text: THEME.colors.text,
-          card: THEME.colors.divider,
+          background: theme.colors.background,
+          primary: theme.colors.primary,
+          text: theme.colors.text,
+          card: theme.colors.divider,
         },
       }}
     >
