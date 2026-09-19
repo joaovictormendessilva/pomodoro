@@ -1,17 +1,17 @@
 import { useNavigation } from "@react-navigation/native";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { SCREENS } from "@/app-routes/constants/screens";
-import type { NavigationScreenProps } from "@/app-routes/types/NavigationScreenProps";
+import { routes } from "@/navigation/routes";
+import type { RootStackNavigationProp } from "@/navigation/types";
 
 export function HomeScreen() {
-  const navigation = useNavigation<NavigationScreenProps>();
+  const navigation = useNavigation<RootStackNavigationProp<"Home">>();
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Home Screen</Text>
 
-      <TouchableOpacity onPress={() => navigation.navigate(SCREENS.SettingsScreen)}>
+      <TouchableOpacity onPress={() => navigation.navigate(routes.Settings)}>
         <Text>Settings Screen</Text>
       </TouchableOpacity>
     </View>

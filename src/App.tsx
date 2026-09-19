@@ -1,10 +1,8 @@
 import { Inter_400Regular, Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
-import { NavigationContainer } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
-import { AppRoutes } from "./app-routes/AppRoutes";
-import { navigationTheme } from "@/theme/navigation-theme";
+import { AppRoutes } from "@/navigation";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,9 +22,5 @@ export function App() {
     return null;
   }
 
-  return (
-    <NavigationContainer theme={navigationTheme}>
-      <AppRoutes />
-    </NavigationContainer>
-  );
+  return <AppRoutes />;
 }
