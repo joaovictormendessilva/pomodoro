@@ -1,4 +1,6 @@
-import { Inter_400Regular, Inter_700Bold, useFonts } from "@expo-google-fonts/inter";
+import { Inter_400Regular } from "@expo-google-fonts/inter/400Regular";
+import { Inter_700Bold } from "@expo-google-fonts/inter/700Bold";
+import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
