@@ -47,9 +47,10 @@ export function HomeScreen() {
   };
 
   const handleStop = () => {
-    setStep(1);
+    setStep(0);
+    setCurrentStatus(currentStatusConfig.focus);
     setTimerState(timeStateConfig.notStarted);
-    setCounterCycleTime(initialCounterCycleTime);
+    setCounterCycleTime(currentFocusCycleTime);
   };
 
   const cycleTimeProgress = useMemo(() => {
