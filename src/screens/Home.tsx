@@ -7,41 +7,36 @@ import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { Button } from "@/components/Button";
 import { routes } from "@/navigation/routes";
 import { theme } from "@/theme";
-
-type TimeStateProps = "paused" | "running" | "not-started";
-type CurrentFocusStatusProps = "focus" | "short-break" | "long-break";
-type StepsProps = 0 | 1 | 2 | 3 | 4;
+import type { CycleStatus, Step, TimerState } from "@/types/pomodoro";
 
 const timeStateConfig = {
   notStarted: "not-started",
   running: "running",
   paused: "paused",
-} as const satisfies Record<string, TimeStateProps>;
+} as const satisfies Record<string, TimerState>;
 
 const currentStatusConfig = {
   focus: "focus",
   shortBreak: "short-break",
   longBreak: "long-break",
-} as const satisfies Record<string, CurrentFocusStatusProps>;
+} as const satisfies Record<string, CycleStatus>;
 
 export function HomeScreen() {
   const navigation = useNavigation();
-  const initialShortBeakCicleTime = 0.05 * 60;
-  const initialLongBeakCicleTime = 0.05 * 60;
-  const initialFocusCicleTime = 0.05 * 60;
-  const initialCounterCicleTime = 0.05 * 60;
+  const initialShortBreakCycleTime = 0.05 * 60;
+  const initialLongBreakCycleTime = 0.05 * 60;
+  const initialFocusCycleTime = 0.05 * 60;
+  const initialCounterCycleTime = 0.05 * 60;
 
-  const [currentStatus, setCurrentStatus] = useState<CurrentFocusStatusProps>(
-    currentStatusConfig.focus,
-  );
-  const [timerState, setTimerState] = useState<TimeStateProps>(timeStateConfig.notStarted);
-  const [step, setStep] = useState<StepsProps>(0);
+  const [currentStatus, setCurrentStatus] = useState<CycleStatus>(currentStatusConfig.focus);
+  const [timerState, setTimerState] = useState<TimerState>(timeStateConfig.notStarted);
+  const [step, setStep] = useState<Step>(0);
 
-  const [currentFocusCicleTime] = useState(initialFocusCicleTime);
-  const [currentShortBeakCicleTime] = useState(initialShortBeakCicleTime);
-  const [currentLongBeakCicleTime] = useState(initialLongBeakCicleTime);
+  const [currentFocusCycleTime] = useState(initialFocusCycleTime);
+  const [currentShortBreakCycleTime] = useState(initialShortBreakCycleTime);
+  const [currentLongBreakCycleTime] = useState(initialLongBreakCycleTime);
 
-  const [counterCicleTime, setCounterCicleTime] = useState(initialCounterCicleTime);
+  const [counterCycleTime, setCounterCycleTime] = useState(initialCounterCycleTime);
 
   const handleStart = () => {
     setTimerState(timeStateConfig.running);
@@ -54,22 +49,22 @@ export function HomeScreen() {
   const handleStop = () => {
     setStep(1);
     setTimerState(timeStateConfig.notStarted);
-    setCounterCicleTime(initialCounterCicleTime);
+    setCounterCycleTime(initialCounterCycleTime);
   };
 
-  const cicleTimeProgress = useMemo(() => {
+  const cycleTimeProgress = useMemo(() => {
     switch (currentStatus) {
       case currentStatusConfig.focus:
-        return 100 - (counterCicleTime / currentFocusCicleTime) * 100;
+        return 100 - (counterCycleTime / currentFocusCycleTime) * 100;
       case currentStatusConfig.shortBreak:
-        return 100 - (counterCicleTime / currentShortBeakCicleTime) * 100;
+        return 100 - (counterCycleTime / currentShortBreakCycleTime) * 100;
       case currentStatusConfig.longBreak:
-        return 100 - (counterCicleTime / currentLongBeakCicleTime) * 100;
+        return 100 - (counterCycleTime / currentLongBreakCycleTime) * 100;
 
       default:
         return 0;
     }
-  }, [currentStatus, counterCicleTime, currentShortBeakCicleTime, currentLongBeakCicleTime]);
+  }, [currentStatus, counterCycleTime, currentShortBreakCycleTime, currentLongBreakCycleTime]);
 
   const isNotStarted = timerState === timeStateConfig.notStarted;
   const isRunning = timerState === timeStateConfig.running;
@@ -79,7 +74,7 @@ export function HomeScreen() {
     if (!isRunning) return;
 
     const ref = setInterval(() => {
-      setCounterCicleTime((previous) => (previous <= 0 ? previous : previous - 1));
+      setCounterCycleTime((previous) => (previous <= 0 ? previous : previous - 1));
     }, 1000);
 
     return () => clearInterval(ref);
@@ -88,25 +83,25 @@ export function HomeScreen() {
   useEffect(() => {
     switch (currentStatus) {
       case currentStatusConfig.focus: {
-        if (counterCicleTime > 0) break;
+        if (counterCycleTime > 0) break;
 
         if (step < 4) {
-          setStep((previous) => (previous + 1) as StepsProps);
+          setStep((previous) => (previous + 1) as Step);
           setCurrentStatus(currentStatusConfig.shortBreak);
-          setCounterCicleTime(currentShortBeakCicleTime);
+          setCounterCycleTime(currentShortBreakCycleTime);
         } else {
           setStep(0);
           setCurrentStatus(currentStatusConfig.longBreak);
-          setCounterCicleTime(currentLongBeakCicleTime);
+          setCounterCycleTime(currentLongBreakCycleTime);
         }
         break;
       }
 
       case currentStatusConfig.shortBreak:
       case currentStatusConfig.longBreak: {
-        if (counterCicleTime <= 0) {
+        if (counterCycleTime <= 0) {
           setCurrentStatus(currentStatusConfig.focus);
-          setCounterCicleTime(currentFocusCicleTime);
+          setCounterCycleTime(currentFocusCycleTime);
         }
         break;
       }
@@ -114,10 +109,10 @@ export function HomeScreen() {
   }, [
     step,
     currentStatus,
-    counterCicleTime,
-    currentFocusCicleTime,
-    currentLongBeakCicleTime,
-    currentShortBeakCicleTime,
+    counterCycleTime,
+    currentFocusCycleTime,
+    currentLongBreakCycleTime,
+    currentShortBreakCycleTime,
   ]);
 
   return (
@@ -156,11 +151,11 @@ export function HomeScreen() {
               tintColor={theme.colors.primary}
               rotation={0}
               backgroundColor={theme.colors.divider}
-              fill={cicleTimeProgress}
+              fill={cycleTimeProgress}
               children={() => (
                 <Text style={styles.progressText}>
-                  {Math.floor(counterCicleTime / 60)}:
-                  {(counterCicleTime % 60).toString().padStart(2, "0")}
+                  {Math.floor(counterCycleTime / 60)}:
+                  {(counterCycleTime % 60).toString().padStart(2, "0")}
                 </Text>
               )}
             />
