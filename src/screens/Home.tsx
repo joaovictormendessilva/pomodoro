@@ -9,6 +9,8 @@ import { routes } from "@/navigation/routes";
 import { theme } from "@/theme";
 import type { CycleStatus, Step, TimerState } from "@/types/pomodoro";
 
+const TOTAL_STEPS = 4;
+
 const timeStateConfig = {
   notStarted: "not-started",
   running: "running",
@@ -86,21 +88,30 @@ export function HomeScreen() {
       case currentStatusConfig.focus: {
         if (counterCycleTime > 0) break;
 
-        if (step < 4) {
-          setStep((previous) => (previous + 1) as Step);
+        const completedSteps = (step + 1) as Step;
+        setStep(completedSteps);
+
+        if (completedSteps < TOTAL_STEPS) {
           setCurrentStatus(currentStatusConfig.shortBreak);
           setCounterCycleTime(currentShortBreakCycleTime);
         } else {
-          setStep(0);
           setCurrentStatus(currentStatusConfig.longBreak);
           setCounterCycleTime(currentLongBreakCycleTime);
         }
         break;
       }
 
-      case currentStatusConfig.shortBreak:
+      case currentStatusConfig.shortBreak: {
+        if (counterCycleTime <= 0) {
+          setCurrentStatus(currentStatusConfig.focus);
+          setCounterCycleTime(currentFocusCycleTime);
+        }
+        break;
+      }
+
       case currentStatusConfig.longBreak: {
         if (counterCycleTime <= 0) {
+          setStep(0);
           setCurrentStatus(currentStatusConfig.focus);
           setCounterCycleTime(currentFocusCycleTime);
         }
