@@ -1,14 +1,124 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
-import { MaterialIcons } from "@expo/vector-icons";
 
 import { Button } from "@/components/Button";
-import { theme } from "@/theme";
-import { useNavigation } from "@react-navigation/native";
 import { routes } from "@/navigation/routes";
+import { theme } from "@/theme";
+
+type TimeStateProps = "paused" | "running" | "not-started";
+type CurrentFocusStatusProps = "focus" | "short-break" | "long-break";
+type StepsProps = 0 | 1 | 2 | 3 | 4;
+
+const timeStateConfig = {
+  notStarted: "not-started",
+  running: "running",
+  paused: "paused",
+} as const satisfies Record<string, TimeStateProps>;
+
+const currentStatusConfig = {
+  focus: "focus",
+  shortBreak: "short-break",
+  longBreak: "long-break",
+} as const satisfies Record<string, CurrentFocusStatusProps>;
 
 export function HomeScreen() {
   const navigation = useNavigation();
+  const initialShortBeakCicleTime = 0.05 * 60;
+  const initialLongBeakCicleTime = 0.05 * 60;
+  const initialFocusCicleTime = 0.05 * 60;
+  const initialCounterCicleTime = 0.05 * 60;
+
+  const [currentStatus, setCurrentStatus] = useState<CurrentFocusStatusProps>(
+    currentStatusConfig.focus,
+  );
+  const [timerState, setTimerState] = useState<TimeStateProps>(timeStateConfig.notStarted);
+  const [step, setStep] = useState<StepsProps>(0);
+
+  const [currentFocusCicleTime] = useState(initialFocusCicleTime);
+  const [currentShortBeakCicleTime] = useState(initialShortBeakCicleTime);
+  const [currentLongBeakCicleTime] = useState(initialLongBeakCicleTime);
+
+  const [counterCicleTime, setCounterCicleTime] = useState(initialCounterCicleTime);
+
+  const handleStart = () => {
+    setTimerState(timeStateConfig.running);
+  };
+
+  const handlePause = () => {
+    setTimerState(timeStateConfig.paused);
+  };
+
+  const handleStop = () => {
+    setStep(1);
+    setTimerState(timeStateConfig.notStarted);
+    setCounterCicleTime(initialCounterCicleTime);
+  };
+
+  const cicleTimeProgress = useMemo(() => {
+    switch (currentStatus) {
+      case currentStatusConfig.focus:
+        return 100 - (counterCicleTime / currentFocusCicleTime) * 100;
+      case currentStatusConfig.shortBreak:
+        return 100 - (counterCicleTime / currentShortBeakCicleTime) * 100;
+      case currentStatusConfig.longBreak:
+        return 100 - (counterCicleTime / currentLongBeakCicleTime) * 100;
+
+      default:
+        return 0;
+    }
+  }, [currentStatus, counterCicleTime, currentShortBeakCicleTime, currentLongBeakCicleTime]);
+
+  const isNotStarted = timerState === timeStateConfig.notStarted;
+  const isRunning = timerState === timeStateConfig.running;
+  const isPaused = timerState === timeStateConfig.paused;
+
+  useEffect(() => {
+    if (!isRunning) return;
+
+    const ref = setInterval(() => {
+      setCounterCicleTime((previous) => (previous <= 0 ? previous : previous - 1));
+    }, 1000);
+
+    return () => clearInterval(ref);
+  }, [isRunning]);
+
+  useEffect(() => {
+    switch (currentStatus) {
+      case currentStatusConfig.focus: {
+        if (counterCicleTime > 0) break;
+
+        if (step < 4) {
+          setStep((previous) => (previous + 1) as StepsProps);
+          setCurrentStatus(currentStatusConfig.shortBreak);
+          setCounterCicleTime(currentShortBeakCicleTime);
+        } else {
+          setStep(0);
+          setCurrentStatus(currentStatusConfig.longBreak);
+          setCounterCicleTime(currentLongBeakCicleTime);
+        }
+        break;
+      }
+
+      case currentStatusConfig.shortBreak:
+      case currentStatusConfig.longBreak: {
+        if (counterCicleTime <= 0) {
+          setCurrentStatus(currentStatusConfig.focus);
+          setCounterCicleTime(currentFocusCicleTime);
+        }
+        break;
+      }
+    }
+  }, [
+    step,
+    currentStatus,
+    counterCicleTime,
+    currentFocusCicleTime,
+    currentLongBeakCicleTime,
+    currentShortBeakCicleTime,
+  ]);
 
   return (
     <View style={styles.mainContainer}>
@@ -26,36 +136,63 @@ export function HomeScreen() {
           </View>
 
           <View style={styles.stateContainer}>
-            <Text style={styles.stateText}>Clique em iniciar</Text>
-            <Text style={styles.stateText}>Hora de se concentrar</Text>
-            <Text style={styles.stateText}>Pausa curta</Text>
-            <Text style={styles.stateText}>Pausa longa</Text>
-            <Text style={styles.stateText}>Cronômetro em pausa</Text>
+            {isNotStarted && <Text style={styles.stateText}>Clique em iniciar</Text>}
+            {isRunning && currentStatus === currentStatusConfig.focus && (
+              <Text style={styles.stateText}>Hora de se concentrar</Text>
+            )}
+            {isRunning && currentStatus === currentStatusConfig.shortBreak && (
+              <Text style={styles.stateText}>Pausa curta</Text>
+            )}
+            {isRunning && currentStatus === currentStatusConfig.longBreak && (
+              <Text style={styles.stateText}>Pausa longa</Text>
+            )}
+            {isPaused && <Text style={styles.stateText}>Cronômetro em pausa</Text>}
           </View>
 
           <View style={styles.progressContainer}>
             <AnimatedCircularProgress
               size={160}
               width={7}
-              fill={10}
               tintColor={theme.colors.primary}
               rotation={0}
               backgroundColor={theme.colors.divider}
-              children={() => <Text style={styles.progressText}>12:45</Text>}
+              fill={cicleTimeProgress}
+              children={() => (
+                <Text style={styles.progressText}>
+                  {Math.floor(counterCicleTime / 60)}:
+                  {(counterCicleTime % 60).toString().padStart(2, "0")}
+                </Text>
+              )}
             />
           </View>
 
-          <View style={styles.buttonContainer}>
-            <Button text="Iniciar" onPress={() => {}} />
-          </View>
+          {isNotStarted && (
+            <View style={styles.buttonContainer}>
+              <Button text="Iniciar" onPress={handleStart} />
+            </View>
+          )}
+
+          {isRunning && (
+            <View style={styles.buttonContainer}>
+              <Button text="Pausar" onPress={handlePause} />
+              <Button text="Parar" variant="outlined" onPress={handleStop} />
+            </View>
+          )}
+
+          {isPaused && (
+            <View style={styles.buttonContainer}>
+              <Button text="Continuar" onPress={handleStart} />
+              <Button text="Parar" variant="outlined" onPress={handleStop} />
+            </View>
+          )}
 
           <View style={styles.pomodorosContainer}>
             <Text style={styles.pomodoroText}>Pomodoros:</Text>
 
-            <View style={styles.pomodoroDotCompleted} />
-            <View style={styles.pomodoroDotCompleted} />
-            <View style={styles.pomodoroDot} />
-            <View style={styles.pomodoroDot} />
+            <View style={step >= 1 ? styles.pomodoroDotCompleted : styles.pomodoroDot} />
+            <View style={step >= 2 ? styles.pomodoroDotCompleted : styles.pomodoroDot} />
+            <View style={step >= 3 ? styles.pomodoroDotCompleted : styles.pomodoroDot} />
+            <View style={step >= 4 ? styles.pomodoroDotCompleted : styles.pomodoroDot} />
           </View>
         </View>
       </View>
