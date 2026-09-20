@@ -4,9 +4,26 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { Button } from "@/components/Button";
 import { theme } from "@/theme";
+import { useState } from "react";
 
 export function SettingsScreen() {
   const navigation = useNavigation();
+
+  const [focusPeriod, setFocusPeriod] = useState<number>(25);
+  const [shortBreak, setShortBreak] = useState<number>(5);
+  const [longBreak, setLongBreak] = useState<number>(15);
+  const [notificationPeriod, setNotificationPeriod] = useState<boolean>(true);
+
+  const changeFocusPeriod = (value: number) => setFocusPeriod(value);
+  const changeShortBreak = (value: number) => setShortBreak(value);
+  const changeLongBreak = (value: number) => setLongBreak(value);
+  const changeNotificationPeriod = (value: boolean) => setNotificationPeriod(value);
+
+  const isFocusPeriodActive = (value: number) => (focusPeriod === value ? "primary" : "secondary");
+  const isShortBreakActive = (value: number) => (shortBreak === value ? "primary" : "secondary");
+  const isLongBreakActive = (value: number) => (longBreak === value ? "primary" : "secondary");
+  const isNotificationPeriodActive = (value: boolean) =>
+    notificationPeriod === value ? "primary" : "secondary";
 
   return (
     <View style={styles.mainContainer}>
@@ -22,35 +39,79 @@ export function SettingsScreen() {
         <View style={styles.formContainer}>
           <Text style={styles.formTitleText}>Período de foco</Text>
           <View style={styles.formButtonsContainer}>
-            <Button text="15 min" onPress={() => {}} color="secondary" />
-            <Button text="25 min" onPress={() => {}} />
-            <Button text="35 min" onPress={() => {}} color="secondary" />
+            <Button
+              text="15 min"
+              onPress={() => changeFocusPeriod(15)}
+              color={isFocusPeriodActive(15)}
+            />
+            <Button
+              text="25 min"
+              onPress={() => changeFocusPeriod(25)}
+              color={isFocusPeriodActive(25)}
+            />
+            <Button
+              text="35 min"
+              onPress={() => changeFocusPeriod(35)}
+              color={isFocusPeriodActive(35)}
+            />
           </View>
         </View>
 
         <View style={styles.formContainer}>
           <Text style={styles.formTitleText}>Pausa curta</Text>
           <View style={styles.formButtonsContainer}>
-            <Button text="3 min" onPress={() => {}} color="secondary" />
-            <Button text="5 min" onPress={() => {}} />
-            <Button text="7 min" onPress={() => {}} color="secondary" />
+            <Button
+              text="3 min"
+              onPress={() => changeShortBreak(3)}
+              color={isShortBreakActive(3)}
+            />
+            <Button
+              text="5 min"
+              onPress={() => changeShortBreak(5)}
+              color={isShortBreakActive(5)}
+            />
+            <Button
+              text="7 min"
+              onPress={() => changeShortBreak(7)}
+              color={isShortBreakActive(7)}
+            />
           </View>
         </View>
 
         <View style={styles.formContainer}>
           <Text style={styles.formTitleText}>Pausa longa</Text>
           <View style={styles.formButtonsContainer}>
-            <Button text="10 min" onPress={() => {}} color="secondary" />
-            <Button text="15 min" onPress={() => {}} />
-            <Button text="20 min" onPress={() => {}} color="secondary" />
+            <Button
+              text="10 min"
+              onPress={() => changeLongBreak(10)}
+              color={isLongBreakActive(10)}
+            />
+            <Button
+              text="15 min"
+              onPress={() => changeLongBreak(15)}
+              color={isLongBreakActive(15)}
+            />
+            <Button
+              text="20 min"
+              onPress={() => changeLongBreak(20)}
+              color={isLongBreakActive(20)}
+            />
           </View>
         </View>
 
         <View style={styles.formContainer}>
           <Text style={styles.formTitleText}>Notificações</Text>
           <View style={styles.formButtonsContainerNotifications}>
-            <Button text="Desativado" onPress={() => {}} color="secondary" />
-            <Button text="Ativado" onPress={() => {}} />
+            <Button
+              text="Desativado"
+              onPress={() => changeNotificationPeriod(false)}
+              color={isNotificationPeriodActive(false)}
+            />
+            <Button
+              text="Ativado"
+              onPress={() => changeNotificationPeriod(true)}
+              color={isNotificationPeriodActive(true)}
+            />
           </View>
         </View>
       </View>
