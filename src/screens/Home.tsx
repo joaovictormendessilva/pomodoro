@@ -1,10 +1,10 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useMemo, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 
 import { Button } from "@/components/Button";
+import { IconButton } from "@/components/IconButton";
 import { routes } from "@/navigation/routes";
 import { theme } from "@/theme";
 import type { CycleStatus, Step, TimerState } from "@/types/pomodoro";
@@ -129,12 +129,12 @@ export function HomeScreen() {
 
   return (
     <View style={styles.mainContainer}>
-      <TouchableOpacity
-        style={styles.settingsIcon}
+      <IconButton
+        icon="settings"
+        accessibilityLabel="Abrir configurações"
         onPress={() => navigation.navigate(routes.Settings)}
-      >
-        <MaterialIcons name="settings" size={28} color={theme.colors.text} />
-      </TouchableOpacity>
+        style={styles.settingsButton}
+      />
 
       <View style={styles.container}>
         <View style={styles.titleGroup}>
@@ -209,9 +209,8 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   mainContainer: { flex: 1 },
-  settingsIcon: {
+  settingsButton: {
     alignSelf: "flex-end",
-    padding: 16,
   },
   container: {
     gap: 36,
