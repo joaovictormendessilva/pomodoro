@@ -3,9 +3,8 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { IconButton } from "@/components/IconButton";
 import { theme } from "@/theme";
-
+import { usePomodoroSettings } from "@/hooks/usePomodoroSettings";
 import { OptionGroup } from "./components/OptionGroup";
-import { useSettingsForm } from "./hooks/useSettingsForm";
 
 const focusPeriodOptions = [
   { label: "15 min", value: 15 },
@@ -32,7 +31,7 @@ const notificationOptions = [
 
 export function SettingsScreen() {
   const navigation = useNavigation();
-  const { settings, setField } = useSettingsForm();
+  const { settings, setField } = usePomodoroSettings();
 
   return (
     <View style={styles.mainContainer}>

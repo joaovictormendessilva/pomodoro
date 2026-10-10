@@ -6,6 +6,7 @@ import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { Button } from "@/components/Button";
 import { IconButton } from "@/components/IconButton";
 import { routes } from "@/navigation/routes";
+import { PomodoroSettings } from "@/services/types";
 import { theme } from "@/theme";
 import type { CycleStatus, Step, TimerState } from "@/types/pomodoro";
 
@@ -23,22 +24,22 @@ const currentStatusConfig = {
   longBreak: "long-break",
 } as const satisfies Record<string, CycleStatus>;
 
-export function HomeScreen() {
+type PomodoroTimerProps = {
+  settings: PomodoroSettings;
+};
+
+export function PomodoroTimer({ settings }: PomodoroTimerProps) {
   const navigation = useNavigation();
-  const initialShortBreakCycleTime = 0.05 * 60;
-  const initialLongBreakCycleTime = 0.05 * 60;
-  const initialFocusCycleTime = 0.05 * 60;
-  const initialCounterCycleTime = 0.05 * 60;
+
+  const focusPeriod = settings.focusPeriod * 60;
+  const shortBreak = settings.shortBreak * 60;
+  const longBreak = settings.longBreak * 60;
 
   const [currentStatus, setCurrentStatus] = useState<CycleStatus>(currentStatusConfig.focus);
   const [timerState, setTimerState] = useState<TimerState>(timeStateConfig.notStarted);
   const [step, setStep] = useState<Step>(0);
 
-  const [currentFocusCycleTime] = useState(initialFocusCycleTime);
-  const [currentShortBreakCycleTime] = useState(initialShortBreakCycleTime);
-  const [currentLongBreakCycleTime] = useState(initialLongBreakCycleTime);
-
-  const [counterCycleTime, setCounterCycleTime] = useState(initialCounterCycleTime);
+  const [counterCycleTime, setCounterCycleTime] = useState(focusPeriod);
 
   const handleStart = () => {
     setTimerState(timeStateConfig.running);
@@ -52,26 +53,32 @@ export function HomeScreen() {
     setStep(0);
     setCurrentStatus(currentStatusConfig.focus);
     setTimerState(timeStateConfig.notStarted);
-    setCounterCycleTime(currentFocusCycleTime);
+    setCounterCycleTime(focusPeriod);
   };
 
   const cycleTimeProgress = useMemo(() => {
     switch (currentStatus) {
       case currentStatusConfig.focus:
-        return 100 - (counterCycleTime / currentFocusCycleTime) * 100;
+        return 100 - (counterCycleTime / focusPeriod) * 100;
       case currentStatusConfig.shortBreak:
-        return 100 - (counterCycleTime / currentShortBreakCycleTime) * 100;
+        return 100 - (counterCycleTime / shortBreak) * 100;
       case currentStatusConfig.longBreak:
-        return 100 - (counterCycleTime / currentLongBreakCycleTime) * 100;
+        return 100 - (counterCycleTime / longBreak) * 100;
 
       default:
         return 0;
     }
-  }, [currentStatus, counterCycleTime, currentShortBreakCycleTime, currentLongBreakCycleTime]);
+  }, [currentStatus, focusPeriod, counterCycleTime, shortBreak, longBreak]);
 
   const isNotStarted = timerState === timeStateConfig.notStarted;
   const isRunning = timerState === timeStateConfig.running;
   const isPaused = timerState === timeStateConfig.paused;
+
+  useEffect(() => {
+    if (timerState === timeStateConfig.notStarted) {
+      setCounterCycleTime(focusPeriod);
+    }
+  }, [focusPeriod, timerState]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -93,10 +100,10 @@ export function HomeScreen() {
 
         if (completedSteps < TOTAL_STEPS) {
           setCurrentStatus(currentStatusConfig.shortBreak);
-          setCounterCycleTime(currentShortBreakCycleTime);
+          setCounterCycleTime(shortBreak);
         } else {
           setCurrentStatus(currentStatusConfig.longBreak);
-          setCounterCycleTime(currentLongBreakCycleTime);
+          setCounterCycleTime(longBreak);
         }
         break;
       }
@@ -104,7 +111,7 @@ export function HomeScreen() {
       case currentStatusConfig.shortBreak: {
         if (counterCycleTime <= 0) {
           setCurrentStatus(currentStatusConfig.focus);
-          setCounterCycleTime(currentFocusCycleTime);
+          setCounterCycleTime(focusPeriod);
         }
         break;
       }
@@ -113,19 +120,12 @@ export function HomeScreen() {
         if (counterCycleTime <= 0) {
           setStep(0);
           setCurrentStatus(currentStatusConfig.focus);
-          setCounterCycleTime(currentFocusCycleTime);
+          setCounterCycleTime(focusPeriod);
         }
         break;
       }
     }
-  }, [
-    step,
-    currentStatus,
-    counterCycleTime,
-    currentFocusCycleTime,
-    currentLongBreakCycleTime,
-    currentShortBreakCycleTime,
-  ]);
+  }, [step, currentStatus, counterCycleTime, focusPeriod, longBreak, shortBreak]);
 
   return (
     <View style={styles.mainContainer}>
