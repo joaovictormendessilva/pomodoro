@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import type { PomodoroSettings } from "./types";
+import type { AppState, PomodoroSettings } from "./types";
 
 export const defaultSettings: PomodoroSettings = {
   focusPeriod: 25,
@@ -9,11 +9,12 @@ export const defaultSettings: PomodoroSettings = {
   notificationPeriod: true,
 };
 
-const storageKeys: Record<keyof PomodoroSettings, string> = {
+const storageKeys = {
   focusPeriod: "FOCUS_PERIOD",
   shortBreak: "SHORT_BREAK",
   longBreak: "LONG_BREAK",
   notificationPeriod: "NOTIFICATION_PERIOD",
+  appState: "APP_STATE",
 };
 
 export async function loadSettings(): Promise<PomodoroSettings> {
@@ -32,6 +33,20 @@ export async function loadSettings(): Promise<PomodoroSettings> {
       ? notificationPeriod === "true"
       : defaultSettings.notificationPeriod,
   };
+}
+
+export async function loadAppState(): Promise<AppState | null> {
+  const appState = await AsyncStorage.getItem(storageKeys.appState);
+
+  if (appState) {
+    return JSON.parse(appState) as AppState;
+  }
+
+  return null;
+}
+
+export function saveAppState(value: AppState) {
+  return AsyncStorage.setItem(storageKeys.appState, JSON.stringify(value));
 }
 
 export function saveSetting<K extends keyof PomodoroSettings>(key: K, value: PomodoroSettings[K]) {

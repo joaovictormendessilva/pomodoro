@@ -6,7 +6,8 @@ import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { Button } from "@/components/Button";
 import { IconButton } from "@/components/IconButton";
 import { routes } from "@/navigation/routes";
-import { PomodoroSettings } from "@/services/types";
+import { saveAppState } from "@/services/storage-service";
+import { AppState, PomodoroSettings } from "@/services/types";
 import { theme } from "@/theme";
 import type { CycleStatus, Step, TimerState } from "@/types/pomodoro";
 
@@ -26,20 +27,27 @@ const currentStatusConfig = {
 
 type PomodoroTimerProps = {
   settings: PomodoroSettings;
+  appState: AppState | null;
 };
 
-export function PomodoroTimer({ settings }: PomodoroTimerProps) {
+export function PomodoroTimer({ settings, appState }: PomodoroTimerProps) {
   const navigation = useNavigation();
 
   const focusPeriod = settings.focusPeriod * 60;
   const shortBreak = settings.shortBreak * 60;
   const longBreak = settings.longBreak * 60;
 
-  const [currentStatus, setCurrentStatus] = useState<CycleStatus>(currentStatusConfig.focus);
-  const [timerState, setTimerState] = useState<TimerState>(timeStateConfig.notStarted);
-  const [step, setStep] = useState<Step>(0);
+  const [currentStatus, setCurrentStatus] = useState<CycleStatus>(
+    appState?.currentStatus ? appState.currentStatus : currentStatusConfig.focus,
+  );
+  const [timerState, setTimerState] = useState<TimerState>(
+    appState?.timerState ? appState.timerState : timeStateConfig.notStarted,
+  );
+  const [step, setStep] = useState<Step>(appState?.step ? appState.step : 0);
 
-  const [counterCycleTime, setCounterCycleTime] = useState(focusPeriod);
+  const [counterCycleTime, setCounterCycleTime] = useState(
+    appState?.counterCycleTime ?? focusPeriod,
+  );
 
   const handleStart = () => {
     setTimerState(timeStateConfig.running);
@@ -49,7 +57,7 @@ export function PomodoroTimer({ settings }: PomodoroTimerProps) {
     setTimerState(timeStateConfig.paused);
   };
 
-  const handleStop = () => {
+  const handleStop = async () => {
     setStep(0);
     setCurrentStatus(currentStatusConfig.focus);
     setTimerState(timeStateConfig.notStarted);
@@ -125,7 +133,17 @@ export function PomodoroTimer({ settings }: PomodoroTimerProps) {
         break;
       }
     }
-  }, [step, currentStatus, counterCycleTime, focusPeriod, longBreak, shortBreak]);
+
+    saveAppState({
+      step,
+      currentStatus,
+      counterCycleTime,
+      focusPeriod,
+      longBreak,
+      shortBreak,
+      timerState,
+    });
+  }, [step, currentStatus, counterCycleTime, focusPeriod, longBreak, shortBreak, timerState]);
 
   return (
     <View style={styles.mainContainer}>
