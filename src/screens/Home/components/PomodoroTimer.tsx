@@ -5,6 +5,7 @@ import { AnimatedCircularProgress } from "react-native-circular-progress";
 
 import { Button } from "@/components/Button";
 import { IconButton } from "@/components/IconButton";
+import { currentStatusConfig, timeStateConfig } from "@/constants/app-settings";
 import { routes } from "@/navigation/routes";
 import { saveAppState } from "@/services/storage-service";
 import { AppState, PomodoroSettings } from "@/services/types";
@@ -12,18 +13,6 @@ import { theme } from "@/theme";
 import type { CycleStatus, Step, TimerState } from "@/types/pomodoro";
 
 const TOTAL_STEPS = 4;
-
-const timeStateConfig = {
-  notStarted: "not-started",
-  running: "running",
-  paused: "paused",
-} as const satisfies Record<string, TimerState>;
-
-const currentStatusConfig = {
-  focus: "focus",
-  shortBreak: "short-break",
-  longBreak: "long-break",
-} as const satisfies Record<string, CycleStatus>;
 
 type PomodoroTimerProps = {
   settings: PomodoroSettings;
@@ -142,6 +131,7 @@ export function PomodoroTimer({ settings, appState }: PomodoroTimerProps) {
       longBreak,
       shortBreak,
       timerState,
+      dateNow: Date.now(),
     });
   }, [step, currentStatus, counterCycleTime, focusPeriod, longBreak, shortBreak, timerState]);
 

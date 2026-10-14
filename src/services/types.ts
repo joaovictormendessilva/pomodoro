@@ -15,4 +15,5 @@ export type AppState = {
   longBreak: number;
   shortBreak: number;
   timerState: TimerState;
+  dateNow: number;
 };

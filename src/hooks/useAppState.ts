@@ -1,3 +1,4 @@
+import { updateStateByElapsedTime } from "@/helpers/update-state-by-elapsed-time";
 import { loadAppState } from "@/services/storage-service";
 import { AppState } from "@/services/types";
 import { useCallback, useEffect, useState } from "react";
@@ -12,7 +13,15 @@ export const useAppState = () => {
 
   useEffect(() => {
     handleLoadAppState()
-      .then((appStateAsync) => setAppState(appStateAsync))
+      .then((appStateAsync) => {
+        if (appStateAsync) {
+          const updateState = updateStateByElapsedTime(appStateAsync);
+          setAppState(updateState);
+          return;
+        }
+
+        setAppState(appStateAsync);
+      })
       .finally(() => setLoadingAppState(false));
   }, []);
 
