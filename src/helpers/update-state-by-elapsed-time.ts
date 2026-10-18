@@ -16,22 +16,25 @@ export const updateStateByElapsedTime = (appState: AppState): AppState => {
 
   const advanceCycle = () => {
     if (currentStatus === currentStatusConfig.focus) {
+      step = (step + 1) as Step;
+
       if (step < 4) {
-        step = (step + 1) as Step;
         currentStatus = currentStatusConfig.shortBreak;
         return appState.shortBreak;
-      } else {
-        step = 1;
-        currentStatus = currentStatusConfig.longBreak;
-        return appState.longBreak;
       }
+
+      currentStatus = currentStatusConfig.longBreak;
+      return appState.longBreak;
     }
 
-    if (
-      currentStatus === currentStatusConfig.shortBreak ||
-      currentStatus === currentStatusConfig.longBreak
-    ) {
-      currentStatus = "focus";
+    if (currentStatus === currentStatusConfig.shortBreak) {
+      currentStatus = currentStatusConfig.focus;
+      return appState.focusPeriod;
+    }
+
+    if (currentStatus === currentStatusConfig.longBreak) {
+      step = 0;
+      currentStatus = currentStatusConfig.focus;
       return appState.focusPeriod;
     }
 
