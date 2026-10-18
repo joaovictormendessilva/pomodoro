@@ -1,66 +1,12 @@
-import { currentStatusConfig, timeStateConfig } from "@/constants/app-settings";
+import { timeStateConfig } from "@/constants/app-settings";
+import { goToNextCycle, TimerPosition } from "@/helpers/go-to-next-cycle";
 import { AppState } from "@/services/types";
-import { CycleStatus, Step } from "@/types/pomodoro";
-
-const POMODOROS_UNTIL_LONG_BREAK = 4;
-
-type TimerPosition = {
-  status: CycleStatus;
-  completedPomodoros: Step;
-  secondsLeftInCycle: number;
-};
 
 const getSecondsSinceLastSave = (lastSaveDate: number, currentDate: number): number => {
   const millisecondsSinceLastSave: number = currentDate - lastSaveDate;
   const secondsSinceLastSave: number = Math.floor(millisecondsSinceLastSave / 1000);
 
   return secondsSinceLastSave;
-};
-
-const getCycleDurationInSeconds = (status: CycleStatus, appState: AppState): number => {
-  switch (status) {
-    case currentStatusConfig.focus:
-      return appState.focusPeriod;
-    case currentStatusConfig.shortBreak:
-      return appState.shortBreak;
-    case currentStatusConfig.longBreak:
-      return appState.longBreak;
-  }
-};
-
-const getStatusAfterFocus = (completedPomodoros: Step): CycleStatus => {
-  const isTimeForLongBreak: boolean = completedPomodoros >= POMODOROS_UNTIL_LONG_BREAK;
-
-  if (isTimeForLongBreak) {
-    return currentStatusConfig.longBreak;
-  }
-
-  return currentStatusConfig.shortBreak;
-};
-
-const goToNextCycle = (finishedCycle: TimerPosition, appState: AppState): TimerPosition => {
-  const finishedFocus: boolean = finishedCycle.status === currentStatusConfig.focus;
-  const finishedLongBreak: boolean = finishedCycle.status === currentStatusConfig.longBreak;
-
-  let nextStatus: CycleStatus = currentStatusConfig.focus;
-  let completedPomodoros: Step = finishedCycle.completedPomodoros;
-
-  if (finishedFocus) {
-    completedPomodoros = (completedPomodoros + 1) as Step;
-    nextStatus = getStatusAfterFocus(completedPomodoros);
-  }
-
-  if (finishedLongBreak) {
-    completedPomodoros = 0;
-  }
-
-  const nextCycle: TimerPosition = {
-    status: nextStatus,
-    completedPomodoros: completedPomodoros,
-    secondsLeftInCycle: getCycleDurationInSeconds(nextStatus, appState),
-  };
-
-  return nextCycle;
 };
 
 const discountSecondsFromTimer = (

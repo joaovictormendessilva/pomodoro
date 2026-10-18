@@ -6,13 +6,12 @@ import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { Button } from "@/components/Button";
 import { IconButton } from "@/components/IconButton";
 import { currentStatusConfig, timeStateConfig } from "@/constants/app-settings";
+import { CycleDurations, goToNextCycle, TimerPosition } from "@/helpers/go-to-next-cycle";
 import { routes } from "@/navigation/routes";
 import { saveAppState } from "@/services/storage-service";
 import { AppState, PomodoroSettings } from "@/services/types";
 import { theme } from "@/theme";
 import type { CycleStatus, Step, TimerState } from "@/types/pomodoro";
-
-const TOTAL_STEPS = 4;
 
 type PomodoroTimerProps = {
   settings: PomodoroSettings;
@@ -88,39 +87,20 @@ export function PomodoroTimer({ settings, appState }: PomodoroTimerProps) {
   }, [isRunning]);
 
   useEffect(() => {
-    switch (currentStatus) {
-      case currentStatusConfig.focus: {
-        if (counterCycleTime > 0) break;
+    const isCycleFinished: boolean = counterCycleTime <= 0;
 
-        const completedSteps = (step + 1) as Step;
-        setStep(completedSteps);
+    if (isCycleFinished) {
+      const finishedCycle: TimerPosition = {
+        status: currentStatus,
+        completedPomodoros: step,
+        secondsLeftInCycle: counterCycleTime,
+      };
+      const cycleDurations: CycleDurations = { focusPeriod, shortBreak, longBreak };
+      const nextCycle: TimerPosition = goToNextCycle(finishedCycle, cycleDurations);
 
-        if (completedSteps < TOTAL_STEPS) {
-          setCurrentStatus(currentStatusConfig.shortBreak);
-          setCounterCycleTime(shortBreak);
-        } else {
-          setCurrentStatus(currentStatusConfig.longBreak);
-          setCounterCycleTime(longBreak);
-        }
-        break;
-      }
-
-      case currentStatusConfig.shortBreak: {
-        if (counterCycleTime <= 0) {
-          setCurrentStatus(currentStatusConfig.focus);
-          setCounterCycleTime(focusPeriod);
-        }
-        break;
-      }
-
-      case currentStatusConfig.longBreak: {
-        if (counterCycleTime <= 0) {
-          setStep(0);
-          setCurrentStatus(currentStatusConfig.focus);
-          setCounterCycleTime(focusPeriod);
-        }
-        break;
-      }
+      setCurrentStatus(nextCycle.status);
+      setStep(nextCycle.completedPomodoros);
+      setCounterCycleTime(nextCycle.secondsLeftInCycle);
     }
 
     saveAppState({
@@ -141,7 +121,11 @@ export function PomodoroTimer({ settings, appState }: PomodoroTimerProps) {
         icon="settings"
         accessibilityLabel="Abrir configurações"
         onPress={() => navigation.navigate(routes.Settings)}
-        style={styles.settingsButton}
+        disabled={timerState !== timeStateConfig.notStarted}
+        style={{
+          ...styles.settingsButton,
+          opacity: timerState !== timeStateConfig.notStarted ? 0 : 1,
+        }}
       />
 
       <View style={styles.container}>
