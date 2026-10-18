@@ -8,5 +8,5 @@ export function HomeScreen() {
 
   if (!settings || loadingAppState) return;
 
-  return <PomodoroTimer settings={settings} appState={appState} />;
+  return <PomodoroTimer key={appState?.dateNow} settings={settings} appState={appState} />;
 }

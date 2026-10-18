@@ -1,29 +1,49 @@
 import { updateStateByElapsedTime } from "@/helpers/update-state-by-elapsed-time";
 import { loadAppState } from "@/services/storage-service";
 import { AppState } from "@/services/types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { type AppStateStatus, AppState as RNAppState } from "react-native";
 
 export const useAppState = () => {
   const [loadingAppState, setLoadingAppState] = useState<boolean>(true);
   const [appState, setAppState] = useState<AppState | null>(null);
+  const [reactNativeAppState, setReactNativeAppState] = useState<AppStateStatus>(
+    RNAppState.currentState,
+  );
+
+  const shouldUpdateAfterBackground = useRef<boolean>(true);
 
   const handleLoadAppState = useCallback(async () => {
     return await loadAppState();
   }, []);
 
   useEffect(() => {
-    handleLoadAppState()
-      .then((appStateAsync) => {
-        if (appStateAsync) {
-          const updateState = updateStateByElapsedTime(appStateAsync);
-          setAppState(updateState);
-          return;
-        }
+    const listener = RNAppState.addEventListener("change", setReactNativeAppState);
 
-        setAppState(appStateAsync);
-      })
-      .finally(() => setLoadingAppState(false));
+    return () => listener.remove();
   }, []);
+
+  useEffect(() => {
+    if (shouldUpdateAfterBackground.current) {
+      shouldUpdateAfterBackground.current = false;
+
+      handleLoadAppState()
+        .then((appStateAsync) => {
+          if (appStateAsync) {
+            const updateState = updateStateByElapsedTime(appStateAsync);
+            setAppState(updateState);
+            return;
+          }
+
+          setAppState(appStateAsync);
+        })
+        .finally(() => setLoadingAppState(false));
+    }
+
+    if (reactNativeAppState === "background") {
+      shouldUpdateAfterBackground.current = true;
+    }
+  }, [reactNativeAppState]);
 
   return { appState, loadingAppState };
 };
