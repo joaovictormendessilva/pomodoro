@@ -1,8 +1,8 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
 
-import { defaultSettings, loadSettings, saveSetting } from "@/services/storage-service";
-import type { PomodoroSettings } from "@/services/types";
+import { defaultSettings, loadSettings, saveSetting } from "@/services/storage/storage.service";
+import type { PomodoroSettings } from "@/services/storage/storage.types";
 
 export function usePomodoroSettings() {
   const [settings, setSettings] = useState<PomodoroSettings | null>(null);

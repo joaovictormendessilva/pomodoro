@@ -1,6 +1,6 @@
 import { timeStateConfig } from "@/constants/app-settings";
 import { goToNextCycle, TimerPosition } from "@/helpers/go-to-next-cycle";
-import { AppState } from "@/services/types";
+import { AppState } from "@/services/storage/storage.types";
 
 const getSecondsSinceLastSave = (lastSaveDate: number, currentDate: number): number => {
   const millisecondsSinceLastSave: number = currentDate - lastSaveDate;
@@ -9,10 +9,7 @@ const getSecondsSinceLastSave = (lastSaveDate: number, currentDate: number): num
   return secondsSinceLastSave;
 };
 
-const discountSecondsFromTimer = (
-  appState: AppState,
-  secondsToDiscount: number,
-): TimerPosition => {
+const discountSecondsFromTimer = (appState: AppState, secondsToDiscount: number): TimerPosition => {
   let timerPosition: TimerPosition = {
     status: appState.currentStatus,
     completedPomodoros: appState.step,

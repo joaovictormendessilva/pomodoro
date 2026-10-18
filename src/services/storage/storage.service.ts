@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import type { AppState, PomodoroSettings } from "./types";
+import type { AppState, PomodoroSettings } from "./storage.types";
 
 export const defaultSettings: PomodoroSettings = {
   focusPeriod: 25,

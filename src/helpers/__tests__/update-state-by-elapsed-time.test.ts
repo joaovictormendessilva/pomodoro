@@ -1,5 +1,5 @@
 import { updateStateByElapsedTime } from "@/helpers/update-state-by-elapsed-time";
-import { AppState } from "@/services/types";
+import { AppState } from "@/services/storage/storage.types";
 import { CycleStatus, Step, TimerState } from "@/types/pomodoro";
 
 const LAST_SAVE_DATE = 1_000_000;

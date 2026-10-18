@@ -8,8 +8,8 @@ import { IconButton } from "@/components/IconButton";
 import { currentStatusConfig, timeStateConfig } from "@/constants/app-settings";
 import { CycleDurations, goToNextCycle, TimerPosition } from "@/helpers/go-to-next-cycle";
 import { routes } from "@/navigation/routes";
-import { saveAppState } from "@/services/storage-service";
-import { AppState, PomodoroSettings } from "@/services/types";
+import { saveAppState } from "@/services/storage/storage.service";
+import { AppState, PomodoroSettings } from "@/services/storage/storage.types";
 import { theme } from "@/theme";
 import type { CycleStatus, Step, TimerState } from "@/types/pomodoro";
 

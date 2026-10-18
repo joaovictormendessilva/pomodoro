@@ -1,6 +1,6 @@
 import { updateStateByElapsedTime } from "@/helpers/update-state-by-elapsed-time";
-import { loadAppState } from "@/services/storage-service";
-import { AppState } from "@/services/types";
+import { loadAppState } from "@/services/storage/storage.service";
+import { AppState } from "@/services/storage/storage.types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type AppStateStatus, AppState as RNAppState } from "react-native";
 
