@@ -10,15 +10,23 @@ type IconButtonProps = {
   accessibilityLabel: string;
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
+  disabled?: boolean;
 };
 
-export function IconButton({ icon, accessibilityLabel, onPress, style }: IconButtonProps) {
+export function IconButton({
+  icon,
+  accessibilityLabel,
+  onPress,
+  style,
+  disabled,
+}: IconButtonProps) {
   return (
     <TouchableOpacity
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
       style={[styles.button, style]}
+      disabled={disabled}
     >
       <MaterialIcons name={icon} size={28} color={theme.colors.text} />
     </TouchableOpacity>
