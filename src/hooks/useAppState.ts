@@ -1,3 +1,4 @@
+import { appVisibilityConfig } from "@/constants/app-settings";
 import { updateStateByElapsedTime } from "@/helpers/update-state-by-elapsed-time";
 import { loadAppState } from "@/services/storage/storage.service";
 import { AppState } from "@/services/storage/storage.types";
@@ -40,7 +41,7 @@ export const useAppState = () => {
         .finally(() => setLoadingAppState(false));
     }
 
-    if (reactNativeAppState === "background") {
+    if (reactNativeAppState === appVisibilityConfig.background) {
       shouldUpdateAfterBackground.current = true;
     }
   }, [reactNativeAppState]);

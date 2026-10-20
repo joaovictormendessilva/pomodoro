@@ -1,3 +1,5 @@
+import type { AppStateStatus } from "react-native";
+
 import { CycleStatus, TimerState } from "@/types/pomodoro";
 
 export const timeStateConfig = {
@@ -18,3 +20,7 @@ export const cycleTitleConfig = {
   [currentStatusConfig.longBreak]: "Pausa longa",
 } as const satisfies Record<CycleStatus, string>;
 
+export const appVisibilityConfig = {
+  open: "active",
+  background: "background",
+} as const satisfies Record<string, AppStateStatus>;
