@@ -5,7 +5,7 @@ import { AnimatedCircularProgress } from "react-native-circular-progress";
 
 import { Button } from "@/components/Button";
 import { IconButton } from "@/components/IconButton";
-import { currentStatusConfig, timeStateConfig } from "@/constants/app-settings";
+import { currentStatusConfig, cycleTitleConfig, timeStateConfig } from "@/constants/app-settings";
 import { CycleDurations, goToNextCycle, TimerPosition } from "@/helpers/go-to-next-cycle";
 import { routes } from "@/navigation/routes";
 import { saveAppState } from "@/services/storage/storage.service";
@@ -136,15 +136,7 @@ export function PomodoroTimer({ settings, appState }: PomodoroTimerProps) {
 
           <View style={styles.stateContainer}>
             {isNotStarted && <Text style={styles.stateText}>Clique em iniciar</Text>}
-            {isRunning && currentStatus === currentStatusConfig.focus && (
-              <Text style={styles.stateText}>Hora de se concentrar</Text>
-            )}
-            {isRunning && currentStatus === currentStatusConfig.shortBreak && (
-              <Text style={styles.stateText}>Pausa curta</Text>
-            )}
-            {isRunning && currentStatus === currentStatusConfig.longBreak && (
-              <Text style={styles.stateText}>Pausa longa</Text>
-            )}
+            {isRunning && <Text style={styles.stateText}>{cycleTitleConfig[currentStatus]}</Text>}
             {isPaused && <Text style={styles.stateText}>Cronômetro em pausa</Text>}
           </View>
 

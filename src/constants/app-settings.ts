@@ -11,3 +11,10 @@ export const currentStatusConfig = {
   shortBreak: "short-break",
   longBreak: "long-break",
 } as const satisfies Record<string, CycleStatus>;
+
+export const cycleTitleConfig = {
+  [currentStatusConfig.focus]: "Hora de se concentrar",
+  [currentStatusConfig.shortBreak]: "Pausa curta",
+  [currentStatusConfig.longBreak]: "Pausa longa",
+} as const satisfies Record<CycleStatus, string>;
+
