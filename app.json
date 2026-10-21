@@ -18,7 +18,8 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.joaovictormsilva.pomodoro"
+      "package": "com.joaovictormsilva.pomodoro",
+      "permissions": ["android.permission.USE_EXACT_ALARM"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
