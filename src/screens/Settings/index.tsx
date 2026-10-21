@@ -6,23 +6,54 @@ import { theme } from "@/theme";
 import { usePomodoroSettings } from "@/hooks/usePomodoroSettings";
 import { OptionGroup } from "./components/OptionGroup";
 
-const focusPeriodOptions = [
+type DurationOption = {
+  label: string;
+  value: number;
+};
+
+const SECONDS_IN_ONE_MINUTE = 60;
+const FOCUS_PERIOD_TEST_SECONDS = 30;
+const SHORT_BREAK_TEST_SECONDS = 15;
+const LONG_BREAK_TEST_SECONDS = 45;
+
+const focusPeriodTestOption: DurationOption = {
+  label: "30 seg (teste)",
+  value: FOCUS_PERIOD_TEST_SECONDS / SECONDS_IN_ONE_MINUTE,
+};
+const focusPeriodRealOptions: DurationOption[] = [
   { label: "15 min", value: 15 },
   { label: "25 min", value: 25 },
   { label: "35 min", value: 35 },
 ];
+const focusPeriodOptions: DurationOption[] = __DEV__
+  ? [focusPeriodTestOption].concat(focusPeriodRealOptions)
+  : focusPeriodRealOptions;
 
-const shortBreakOptions = [
+const shortBreakTestOption: DurationOption = {
+  label: "15 seg (teste)",
+  value: SHORT_BREAK_TEST_SECONDS / SECONDS_IN_ONE_MINUTE,
+};
+const shortBreakRealOptions: DurationOption[] = [
   { label: "3 min", value: 3 },
   { label: "5 min", value: 5 },
   { label: "7 min", value: 7 },
 ];
+const shortBreakOptions: DurationOption[] = __DEV__
+  ? [shortBreakTestOption].concat(shortBreakRealOptions)
+  : shortBreakRealOptions;
 
-const longBreakOptions = [
+const longBreakTestOption: DurationOption = {
+  label: "45 seg (teste)",
+  value: LONG_BREAK_TEST_SECONDS / SECONDS_IN_ONE_MINUTE,
+};
+const longBreakRealOptions: DurationOption[] = [
   { label: "10 min", value: 10 },
   { label: "15 min", value: 15 },
   { label: "20 min", value: 20 },
 ];
+const longBreakOptions: DurationOption[] = __DEV__
+  ? [longBreakTestOption].concat(longBreakRealOptions)
+  : longBreakRealOptions;
 
 const notificationOptions = [
   { label: "Desativado", value: false },
