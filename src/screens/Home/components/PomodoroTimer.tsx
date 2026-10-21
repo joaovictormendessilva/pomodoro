@@ -1,13 +1,19 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { AppState as RNAppState, StyleSheet, Text, View, type AppStateStatus } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 
 import { Button } from "@/components/Button";
 import { IconButton } from "@/components/IconButton";
-import { currentStatusConfig, cycleTitleConfig, timeStateConfig } from "@/constants/app-settings";
+import {
+  appVisibilityConfig,
+  currentStatusConfig,
+  cycleTitleConfig,
+  timeStateConfig,
+} from "@/constants/app-settings";
 import { CycleDurations, goToNextCycle, TimerPosition } from "@/helpers/go-to-next-cycle";
 import { routes } from "@/navigation/routes";
+import { notificationService } from "@/services/notification/notification.service";
 import { saveAppState } from "@/services/storage/storage.service";
 import { AppState, PomodoroSettings } from "@/services/storage/storage.types";
 import { theme } from "@/theme";
@@ -114,6 +120,27 @@ export function PomodoroTimer({ settings, appState }: PomodoroTimerProps) {
       dateNow: Date.now(),
     });
   }, [step, currentStatus, counterCycleTime, focusPeriod, longBreak, shortBreak, timerState]);
+
+  useEffect(() => {
+    const handleAppVisibilityChange = (nextAppVisibility: AppStateStatus) => {
+      const isAppOpen: boolean = nextAppVisibility === appVisibilityConfig.open;
+      const isAppInBackground: boolean = nextAppVisibility === appVisibilityConfig.background;
+      const shouldScheduleNotifications: boolean =
+        isAppInBackground && isRunning && settings.notificationPeriod;
+
+      if (isAppOpen) {
+        notificationService.cancelTimerNotifications();
+      }
+
+      if (shouldScheduleNotifications) {
+        notificationService.scheduleTimerNotifications();
+      }
+    };
+
+    const subscription = RNAppState.addEventListener("change", handleAppVisibilityChange);
+
+    return () => subscription.remove();
+  }, [isRunning, settings.notificationPeriod]);
 
   return (
     <View style={styles.mainContainer}>

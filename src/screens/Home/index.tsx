@@ -12,6 +12,10 @@ export function HomeScreen() {
   const isNotificationEnabled: boolean = settings?.notificationPeriod === true;
 
   useEffect(() => {
+    notificationService.cancelTimerNotifications();
+  }, []);
+
+  useEffect(() => {
     if (!isNotificationEnabled) return;
 
     notificationService.requestPermission();
